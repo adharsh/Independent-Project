@@ -8,4 +8,4 @@ Prototype:
 Neural Network Forward Propagation for Basic Boolean Logic Gates
 
 Main Project:
-Implementation of Neural Networks that Classifies and Recognizes Handritten Digits
+Neural Network that Classifies and Recognizes Handritten Digits
