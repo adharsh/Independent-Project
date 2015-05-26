@@ -1,8 +1,11 @@
 # Independent-Project
-AP Computer Science 2015
-Period 6
-Sophomore Year
+AP Computer Science 2015, Period 6, Sophomore Year
 
-A Form of Artificial Intelligence that Classifies and Recognizes Handritten Digits
-Implementation of Neural Networks
+On Creating a Form Of Artificial Intelligence Based Loosely on the Architecture of the Human Brain
 
+
+Prototype:
+Neural Network Forward Propagation for Basic Boolean Logic Gates
+
+Main Project:
+Implementation of Neural Networks that Classifies and Recognizes Handritten Digits
