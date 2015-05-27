@@ -186,28 +186,4 @@ public class DataVisualization {
 
 	}
 
-	public static void main2(String[] args) {
-
-		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/mlclass/data.mat" );
-
-		MatFileReader matFileReader = null;
-		try {
-			matFileReader = new MatFileReader( dataMat );
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		//double[][] getArray() Gets two-dimensional real array.
-		//MLArray array = mfr.getMLArray("ex4data1");
-		//MLDouble j = (MLDouble)matfilereader.getMLArray("dataname");
-		MLDouble XmlArray = (MLDouble) matFileReader.getMLArray("X");
-
-		double[][] Xarray = XmlArray.getArray();
-
-		DenseMatrix64F X = new DenseMatrix64F(Xarray);
-
-		new DataVisualizationDraft( X, true, 1);
-
-	}
-
 }
