@@ -52,12 +52,12 @@ public class FreeHandPainter extends JFrame implements ActionListener {
 		BufferedImage dataImage = new BufferedImage( getWidth(),getHeight(), BufferedImage.TYPE_INT_RGB );
 		Graphics2D graphics = dataImage.createGraphics();
 		paint(graphics);
-		try {
+	/*	try {
 			ImageIO.write(dataImage,"jpeg", new File("/Users/ababu/Desktop/DataImage.jpeg"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		image = dataImage;
 		System.out.println("Image Saved");
 	}
