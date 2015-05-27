@@ -43,7 +43,7 @@ public class FreeHandPainter extends JFrame implements ActionListener {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation( (int) (dim.width*(1.0/6.1)), (int) (dim.height*(1.0/9.5)) );
 		setSize( 200,200 );
-		setBackground(new Color( 127, 127, 127));
+		setBackground(new Color( 0.5f, 0.5f, 0.5f));
 		setVisible( true );
 	}
 	
@@ -52,14 +52,16 @@ public class FreeHandPainter extends JFrame implements ActionListener {
 		BufferedImage dataImage = new BufferedImage( getWidth(),getHeight(), BufferedImage.TYPE_INT_RGB );
 		Graphics2D graphics = dataImage.createGraphics();
 		paint(graphics);
-	/*	try {
-			ImageIO.write(dataImage,"jpeg", new File("/Users/ababu/Desktop/DataImage.jpeg"));
+		printAll(graphics);
+		try {
+			ImageIO.write(dataImage,"bmp", new File("/Users/ababu/Desktop/DataImage.bmp"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 		image = dataImage;
-		System.out.println("Image Saved");
+		System.out.println("Image Saved.");
+		
 	}
 	
 	 public void paint ( Graphics g ){
