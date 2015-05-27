@@ -1,8 +1,9 @@
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +73,7 @@ public class DataVisualization {
 	private void runGUI( ){
 
 		frame = new JFrame("Figure " + figure.intValue());
+		frame.setAlwaysOnTop(true);
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE);
 
 		contentPane = new JPanel(); //new JPanel();
@@ -91,15 +93,13 @@ public class DataVisualization {
 		//	contentPane.add( drawGrid() );
 
 		contentPane.add( displayData() );
-
-
 		frame.setContentPane( contentPane );
 
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		//	frame.setLocation( dim.width/2 - frame.getSize().width/2, dim.height/2 - frame.getSize().height/2 );
 		// centers to screen regardless -> frame.setLocationRelativeTo(null);
 
-		frame.setLocation( (int) (dim.width*(3.0/4.6)), (int) (dim.height*(1.0/8.3)) );
+		frame.setLocation( (int) (dim.width*(3.0/5.1)), (int) (dim.height*(1.0/9.5)) );
 
 		frame.pack();
 		frame.setVisible( true );
@@ -108,9 +108,7 @@ public class DataVisualization {
 	public JLabel displayData(){
 		Scanner io = new Scanner(System.in);
 
-
 		int example_width = (int) (Math.sqrt( X.getNumCols() ) + 0.5);
-
 
 		int m = X.getNumRows();
 		int n = X.getNumCols();
@@ -154,13 +152,9 @@ public class DataVisualization {
 			}
 		}
 
-
-
 		BufferedImage display = new BufferedImage(display_array.numCols, display_array.numRows, BufferedImage.TYPE_INT_RGB);
 		CommonOps.add(display_array, 1);
 		CommonOps.scale(127.5, display_array);
-
-
 
 		for(int x = 0; x < display_array.numCols; x++){
 			for(int y = 0; y < display_array.numRows; y++){
@@ -171,8 +165,12 @@ public class DataVisualization {
 		
 		BufferedImage scaleImageGraphics = new BufferedImage( 320, 320, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = scaleImageGraphics.createGraphics();
-		AffineTransform transformImage = AffineTransform.getScaleInstance(1.5, 1.5);
-		graphics.drawRenderedImage(display, transformImage);
+		graphics.drawImage( display, 0, 0, 320, 320, null );
+		graphics.dispose();
+		graphics.setComposite( AlphaComposite.Src);
+		graphics.setRenderingHint( RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR );
+		graphics.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
+		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
 		
 		JLabel answer = new JLabel( new ImageIcon(scaleImageGraphics) );
 		
