@@ -1,10 +1,15 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Scanner;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,17 +43,17 @@ public class DataVisualization {
 	public DataVisualization( DenseMatrix64F X ){
 
 		this.X = X;
-		
-		
+
+
 		if( figure == null){
 			figure = new Integer(1);
 		} else{
-		
-		figure = new Integer( figure.intValue() + 1);
+
+			figure = new Integer( figure.intValue() + 1);
 		}
-		
+
 		// System.out.println(figure);
-		
+
 		/*
 		 * Methods that create and show a GUI shoudl be run from an event-dispatching thread
 		 */
@@ -63,14 +68,14 @@ public class DataVisualization {
 
 	}
 
-	
+
 	private void runGUI( ){
 
-		frame = new JFrame("Data Visualization");
-		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		frame = new JFrame("Figure " + figure.intValue());
+		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE);
 
 		contentPane = new JPanel(); //new JPanel();
-		contentPane.setBorder( BorderFactory.createEmptyBorder(30, 100, 30, 100) );
+		contentPane.setBorder( BorderFactory.createEmptyBorder(30, 60, 30, 60) );
 		contentPane.setBackground( new Color( 240, 240, 240) );
 
 		/*		label = new JLabel( "Data Vsiualization Text");
@@ -84,16 +89,16 @@ public class DataVisualization {
 
 		//	adds grid of pics label
 		//	contentPane.add( drawGrid() );
-		
+
 		contentPane.add( displayData() );
-		
-		
+
+
 		frame.setContentPane( contentPane );
 
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		//	frame.setLocation( dim.width/2 - frame.getSize().width/2, dim.height/2 - frame.getSize().height/2 );
 		// centers to screen regardless -> frame.setLocationRelativeTo(null);
-		
+
 		frame.setLocation( (int) (dim.width*(3.0/4.6)), (int) (dim.height*(1.0/8.3)) );
 
 		frame.pack();
@@ -101,6 +106,8 @@ public class DataVisualization {
 	}
 
 	public JLabel displayData(){
+		Scanner io = new Scanner(System.in);
+
 
 		int example_width = (int) (Math.sqrt( X.getNumCols() ) + 0.5);
 
@@ -113,50 +120,76 @@ public class DataVisualization {
 		int display_rows = (int) ( Math.floor( Math.sqrt(m) ) );
 		//	int display_rows = (int) ( Math.floor( Math.sqrt(m) ) + 0.5 );
 		int display_cols = (int) Math.ceil( m/display_rows );
-		
+
 		int pad = 1;
-		
+
 		DenseMatrix64F display_array = new DenseMatrix64F( (pad + display_rows * (example_height + pad)), (pad + display_cols * (example_width + pad)) );
-		
+
 		display_array = NNstaticmethods.subNegativeOnes( display_array );
-		
-		int curr_ex = 1;
-		
+
+		int curr_ex = 0;
+
 		for(int j = 0; j < display_rows; j++){
+
 			for(int i = 0; i < display_cols; i++){
 				if( curr_ex > m){
 					break;
 				}
-				
+
 				double max_val = CommonOps.elementMaxAbs( NNstaticmethods.getRow( X , curr_ex)); 
-					
-				DenseMatrix64F tempX = new DenseMatrix64F( 1, X.getNumCols() );
-				DenseMatrix64F tempDisplayArray = new DenseMatrix64F( 1, X.getNumCols() );
-				
-				//	extract submatrix
-				//	set oiginal submatrix to zeros
-				//	submatrix = returned value of reshape()
-				//	insert submatrix
-				
+
+				DenseMatrix64F reshapedMatrix = NNstaticmethods.scale(1.0/max_val, NNstaticmethods.reshape( NNstaticmethods.getRow(X, curr_ex), example_height, example_width) );
+
+				// pad + (j - 1) * (example_height + pad) + (1:example_height), pad + (i - 1) * (example_width + pad) + (1:example_width))
+				display_array = NNstaticmethods.replace(display_array, reshapedMatrix, pad + (j) * (example_height + pad) + 1, 
+						pad + (j) * (example_height + pad) + example_height,  pad + (i) * (example_width + pad) + 1,
+						pad + (i) * (example_width + pad) + example_width);
+			//	display_array.print();
+			//	while(!io.nextLine().equals(""));
+
+				curr_ex++;
+			}
+			if(curr_ex > m){
+				break;
+			}
+		}
+
+
+
+		BufferedImage display = new BufferedImage(display_array.numCols, display_array.numRows, BufferedImage.TYPE_INT_RGB);
+		CommonOps.add(display_array, 1);
+		CommonOps.scale(127.5, display_array);
+
+
+
+		for(int x = 0; x < display_array.numCols; x++){
+			for(int y = 0; y < display_array.numRows; y++){
+				int value = (int)(display_array.get(y, x) + 0.5);
+				display.setRGB(x, y, (new Color( value, value, value )).getRGB() );
 			}
 		}
 		
+		BufferedImage scaleImageGraphics = new BufferedImage( 320, 320, BufferedImage.TYPE_INT_RGB);
+		Graphics2D graphics = scaleImageGraphics.createGraphics();
+		AffineTransform transformImage = AffineTransform.getScaleInstance(1.5, 1.5);
+		graphics.drawRenderedImage(display, transformImage);
 		
-		return null;
+		JLabel answer = new JLabel( new ImageIcon(scaleImageGraphics) );
+		
+		answer.setBorder( BorderFactory.createMatteBorder( 10, 10, 10, 10, Color.black) );
+		
+		return answer;
 	}
 
-	
+
 	public static void main(String[] args){
-		
-		new DataVisualization(null);
-		new DataVisualization(null);
-		new DataVisualization(null);
-		new DataVisualization(null);
-		
+
+		NeuralNetwork.NeuralNetworkDemo();
+
 	}
-	
+
 	public static void main2(String[] args) {
-		
+
 		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/mlclass/data.mat" );
 
 		MatFileReader matFileReader = null;
@@ -174,7 +207,7 @@ public class DataVisualization {
 		double[][] Xarray = XmlArray.getArray();
 
 		DenseMatrix64F X = new DenseMatrix64F(Xarray);
-		
+
 		new DataVisualizationDraft( X, true, 1);
 
 	}

@@ -11,22 +11,49 @@ import com.jmatio.io.MatFileReader;
 import com.jmatio.types.MLDouble;
 
 public class NNstaticmethods {
-	
-	
-	
+
+
+
+	public static DenseMatrix64F replace( DenseMatrix64F larger, DenseMatrix64F smaller, int startRow, int endRow, int startCol, int endCol ){
+
+		DenseMatrix64F answer = new DenseMatrix64F(larger);
+		
+		for(int row = startRow; row <= endRow; row++){
+			for(int col = startCol; col <= endCol; col++){
+				answer.set( row, col, smaller.get(row-startRow, col-startCol) );
+			}
+		}
+
+		return answer;
+
+	}
+
+	public static DenseMatrix64F reshape(DenseMatrix64F matrix, int height, int width){
+
+		DenseMatrix64F answer = new DenseMatrix64F(height, width);
+
+		int counter = 0;
+		for(int col = 0; col < width; col++){
+			for(int row = 0; row < height; row++){
+				answer.set( row, col, matrix.get(counter) );
+				counter++;
+			}
+		}
+		return answer;
+	}
+
 	public static double elementSumSq( DenseMatrix64F matrix){
-		
+
 		double answer = 0;
-		
+
 		for(int i = 0; i < matrix.getNumElements(); i++){
 			answer += Math.pow( (matrix.data[i]), 2);
 		}
-		
+
 		return answer;
 	}
-	
-	
-	
+
+
 	public static void printFTR( DenseMatrix64F matr ){
 
 		(NNstaticmethods.getRow(matr, 0)).print();
@@ -299,20 +326,14 @@ public class NNstaticmethods {
 		System.out.println();
 		 */
 
-		int a234 = 0;
-		System.out.println(a234);
-		System.out.println("dfsdfsdf");
+		DenseMatrix64F matrix = new DenseMatrix64F(20,20);
+		CommonOps.add(matrix, -1);
+		matrix.print();
 
-		double[][] test = { 
-				{5, 4, 7, 8}
-			//	{3, 9, 2, 1}
-		};
-
-		//DenseMatrix64F a = RandomMatrices.createRandom(3, 5, 0, 10, new Random());
-
-		DenseMatrix64F a = new DenseMatrix64F( test );
+		DenseMatrix64F a = RandomMatrices.createRandom(1, 400, -1, 1, new Random());
 		a.print();
-		System.out.println("maxIndex: " + maxIndex(a));
+
+		(NNstaticmethods.reshape(a, 20, 20)).print();
 		System.out.println((System.currentTimeMillis()-time)/1000.0);
 
 	}

@@ -1,15 +1,10 @@
-import java.util.Scanner;
-
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
-import org.ejml.ops.SpecializedOps;
-
 
 public class GradientDescent {
 
 	
 	public static Object[] nnCostFunction( DenseMatrix64F theta1, DenseMatrix64F theta2, int labelSize, DenseMatrix64F X, DenseMatrix64F y, double lambda ){
-		Scanner io = new Scanner(System.in);
 		
 		int m = X.getNumRows();
 

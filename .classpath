@@ -13,6 +13,5 @@
 	<classpathentry kind="lib" path="lib/EJML/EJML-simple-0.27-sources.jar"/>
 	<classpathentry kind="lib" path="lib/EJML/EJML-simple-0.27.jar"/>
 	<classpathentry kind="lib" path="lib/JMATIO/jmatio.jar"/>
-	<classpathentry kind="lib" path="lib/matlabcontrol/matlabcontrol-4.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

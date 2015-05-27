@@ -8,7 +8,6 @@ import org.ejml.ops.CommonOps;
 import com.jmatio.io.MatFileReader;
 import com.jmatio.types.MLDouble;
 
-
 public class BooleanOperatorsNN {
 
 	public static DenseMatrix64F feedForwardPropOneLayer( DenseMatrix64F input, DenseMatrix64F theta ){
@@ -47,6 +46,8 @@ public class BooleanOperatorsNN {
 		DenseMatrix64F a3 = new DenseMatrix64F( z3.getNumRows(), z3.getNumCols() );
 		a3 = NNstaticmethods.sigmoid(z3);
 		
+		CommonOps.transpose(a3);
+		
 		return a3;
 	}
 
@@ -54,7 +55,7 @@ public class BooleanOperatorsNN {
 
 	public static DenseMatrix64F ORneuralnetwork( DenseMatrix64F input ){
 
-		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/BOweights/ORweights.mat" );
+		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/Data/ORweights.mat" );
 
 		MatFileReader matFileReader = null;
 		try {
@@ -74,7 +75,7 @@ public class BooleanOperatorsNN {
 
 	public static DenseMatrix64F ANDneuralnetwork( DenseMatrix64F input ){
 
-		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/BOweights/ANDweights.mat" );
+		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/Data/ANDweights.mat" );
 
 		MatFileReader matFileReader = null;
 		try {
@@ -96,7 +97,7 @@ public class BooleanOperatorsNN {
 
 	public static DenseMatrix64F XNORneuralnetwork( DenseMatrix64F input ){
 
-		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/BOweights/XNORweights.mat" );
+		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/Data/XNORweights.mat" );
 
 		MatFileReader matFileReader = null;
 		try {

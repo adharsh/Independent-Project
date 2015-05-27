@@ -4,8 +4,6 @@ import java.util.Random;
 import java.util.Scanner;
 
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SpecializedOps;
 
 import com.jmatio.io.MatFileReader;
 import com.jmatio.types.MLDouble;
@@ -39,7 +37,7 @@ public class NeuralNetwork {
 		int hiddenLayerSize = 25;
 		int kLabels = 10;
 
-		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/mlclass/data.mat" );
+		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/Data/data.mat" );
 
 		MatFileReader matFileReader = null;
 		try {
@@ -64,17 +62,17 @@ public class NeuralNetwork {
 
 		int m = X.getNumRows();
 
-		//		//%%%%%% Display Data %%%%%%%%%
-		//		DenseMatrix64F showDataAsPics = new DenseMatrix64F( 100, X.getNumCols() );
-		//
-		//		//	(High - low + 1) * Math.random( ) + low
-		//		for(int i = 0; i < 100; i++){
-		//			int rowInd = (int) ((4999-0+1)*Math.random() + 0);
-		//			DenseMatrix64F RowOfshowDataAsPics = NNstaticmethods.getRow(X, rowInd);
-		//			NNstaticmethods.setMatrixWithRow(showDataAsPics, RowOfshowDataAsPics, i);
-		//		}
-		//
-		//		new DataVisualization( showDataAsPics );
+		//%%%%%% Display Data %%%%%%%%%
+		DenseMatrix64F showDataAsPics = new DenseMatrix64F( 100, X.getNumCols() );
+
+		//	(High - low + 1) * Math.random( ) + low
+		for(int i = 0; i < 100; i++){
+			int rowInd = (int) ((4999-0+1)*Math.random() + 0);
+			DenseMatrix64F RowOfshowDataAsPics = NNstaticmethods.getRow(X, rowInd);
+			NNstaticmethods.setMatrixWithRow(showDataAsPics, RowOfshowDataAsPics, i);
+		}
+
+		new DataVisualization( showDataAsPics );
 
 
 		System.out.println("Program paused. Press enter to continue. \n");
@@ -83,23 +81,8 @@ public class NeuralNetwork {
 		/**************** Initializing Neural Network Parameters ***************/					
 		System.out.println("Initializing Neural Network Paramters...");
 
-
-		dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/mlclass/randWeights.mat" );
-		matFileReader = null;
-		try {
-			matFileReader = new MatFileReader( dataMat );
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		MLDouble mlTheta1 = (MLDouble) matFileReader.getMLArray("Theta1");
-		MLDouble mlTheta2 = (MLDouble) matFileReader.getMLArray("Theta2");
-
-		double[][] Theta1array = mlTheta1.getArray();
-		double[][] Theta2array = mlTheta2.getArray();
-
-		DenseMatrix64F theta1 = new DenseMatrix64F(Theta1array);
-		DenseMatrix64F theta2 = new DenseMatrix64F(Theta2array);
+		DenseMatrix64F theta1 = NNstaticmethods.randInitializeWeights(inputLayerSize, hiddenLayerSize);
+		DenseMatrix64F theta2 = NNstaticmethods.randInitializeWeights(hiddenLayerSize, kLabels);
 
 
 		//	DenseMatrix64F theta1 = NNstaticmethods.randInitializeWeights(inputLayerSize, hiddenLayerSize);
@@ -123,7 +106,7 @@ public class NeuralNetwork {
 			theta1 = (DenseMatrix64F) data[1];
 			theta2 = (DenseMatrix64F) data[2];
 
-			if( tempJcost < Jcost){	break outer; }
+			//			if( tempJcost < Jcost){	break outer; }
 			tempJcost = Jcost;
 
 			System.out.println("Iteration\t" + i + " | Cost: " + Jcost);
@@ -136,33 +119,61 @@ public class NeuralNetwork {
 
 		/**************** Visualizing Hidden Layer of Neural Network ***************/
 		System.out.println("Visualizing Hidden Layer of Neural Network...");
-
+		
 		//%%%%%% Display Data %%%%%%%%%
+		new DataVisualization(NNstaticmethods.filter(theta1));
 
 		System.out.println("Program paused. Press enter to continue. \n");
 		while(!io.nextLine().equals(""));
 
 		//%%%%%% Training Set Accuracy %%%%%%%%%
-
+		System.out.println("Training Set Accuracy: " + NeuralNetwork.trainingSetAccuracy(X, y, theta1, theta2)*100 + "%");
+		System.out.println("Program paused. Press enter to continue. \n");
+		while(!io.nextLine().equals(""));
 
 
 		//%%%%%% Display Data %%%%%%%%%
 
 		System.out.println("Displaying Example Image...");
 
-		for(int i = 0; i < 5000; i += 100){
-			System.out.println("Row: " + i);
-			double pred = NNstaticmethods.maxIndex(BooleanOperatorsNN.feedForwardPropTwoLayers(NNstaticmethods.getRow(X, i), theta1, theta2));
-			System.out.println("Neural Network Predictions: " + (int)(pred%10));
-			System.out.println("Actual: " + (int)(y.get(i)%10));
+		while(true){
+			int i = (int)(Math.random()*5000);
+			new DataVisualization(NNstaticmethods.getRow(X, i));
+			int pred = NeuralNetwork.forwardPropagationNeuraNetwork(X, i, theta1, theta2);
+			System.out.println("Neural Network Predictions: " + pred );
+			System.out.println("Actual: " + actualValue(y, i));
 			System.out.println("Program paused. Press enter to continue. \n");
 			while(!io.nextLine().equals(""));
 
 		}
 
-
-
 	}
+
+
+	public static double trainingSetAccuracy( DenseMatrix64F X, DenseMatrix64F y, DenseMatrix64F theta1, DenseMatrix64F theta2 ){
+
+		int nLabels = y.getNumElements();
+		int counter = 0;
+
+		for(int i = 0; i < nLabels; i++){
+
+			if( NeuralNetwork.forwardPropagationNeuraNetwork( X, i, theta1, theta2 ) == NeuralNetwork.actualValue( y, i ) ){
+				counter++;
+			}
+		}
+
+		return (double) ((double)counter/(double)nLabels);
+	}
+
+
+	public static int actualValue( DenseMatrix64F y, int element ){
+		return (int)(y.get(element)%10);
+	}
+
+	public static int forwardPropagationNeuraNetwork( DenseMatrix64F X, int row, DenseMatrix64F theta1, DenseMatrix64F theta2 ){
+		return ((NNstaticmethods.maxIndex(BooleanOperatorsNN.feedForwardPropTwoLayers(NNstaticmethods.getRow(X, row), theta1, theta2))+1)%10);
+	}
+
 
 	/*
 		while(io.nextLine().equals("")){
