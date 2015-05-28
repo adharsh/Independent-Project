@@ -4,9 +4,8 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
 
 import javax.swing.BorderFactory;
@@ -17,9 +16,6 @@ import javax.swing.JPanel;
 
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
-
-import com.jmatio.io.MatFileReader;
-import com.jmatio.types.MLDouble;
 
 
 
@@ -68,7 +64,12 @@ public class DataVisualization {
 
 
 	}
-
+	
+	
+	public void destroy(){
+		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+		figure = new Integer(figure.intValue() - 1);
+	}
 
 	private void runGUI( ){
 
@@ -108,57 +109,57 @@ public class DataVisualization {
 	public JLabel displayData(){
 		Scanner io = new Scanner(System.in);
 
-		int example_width = (int) (Math.sqrt( X.getNumCols() ) + 0.5);
+		int exWidth = (int) (Math.sqrt( X.getNumCols() ) + 0.5);
 
 		int m = X.getNumRows();
 		int n = X.getNumCols();
-		int example_height = (int) (n/example_width);
-		//	int example_height = (int) ( (n / example_width) + 0.5);
+		int exHeight = (int) (n/exWidth);
+		//	int exHeight = (int) ( (n / exWidth) + 0.5);
 
-		int display_rows = (int) ( Math.floor( Math.sqrt(m) ) );
-		//	int display_rows = (int) ( Math.floor( Math.sqrt(m) ) + 0.5 );
-		int display_cols = (int) Math.ceil( m/display_rows );
+		int dispRows = (int) ( Math.floor( Math.sqrt(m) ) );
+		//	int dispRows = (int) ( Math.floor( Math.sqrt(m) ) + 0.5 );
+		int dispCols = (int) Math.ceil( m/dispRows );
 
 		int pad = 1;
 
-		DenseMatrix64F display_array = new DenseMatrix64F( (pad + display_rows * (example_height + pad)), (pad + display_cols * (example_width + pad)) );
+		DenseMatrix64F dispArray = new DenseMatrix64F( (pad + dispRows * (exHeight + pad)), (pad + dispCols * (exWidth + pad)) );
 
-		display_array = NNstaticmethods.subNegativeOnes( display_array );
+		dispArray = NNstaticmethods.subNegativeOnes( dispArray );
 
-		int curr_ex = 0;
+		int currEx = 0;
 
-		for(int j = 0; j < display_rows; j++){
+		for(int j = 0; j < dispRows; j++){
 
-			for(int i = 0; i < display_cols; i++){
-				if( curr_ex > m){
+			for(int i = 0; i < dispCols; i++){
+				if( currEx > m){
 					break;
 				}
 
-				double max_val = CommonOps.elementMaxAbs( NNstaticmethods.getRow( X , curr_ex)); 
+				double max_val = CommonOps.elementMaxAbs( NNstaticmethods.getRow( X , currEx)); 
 
-				DenseMatrix64F reshapedMatrix = NNstaticmethods.scale(1.0/max_val, NNstaticmethods.reshape( NNstaticmethods.getRow(X, curr_ex), example_height, example_width) );
+				DenseMatrix64F reshapedMatrix = NNstaticmethods.scale(1.0/max_val, NNstaticmethods.reshape( NNstaticmethods.getRow(X, currEx), exHeight, exWidth) );
 
-				// pad + (j - 1) * (example_height + pad) + (1:example_height), pad + (i - 1) * (example_width + pad) + (1:example_width))
-				display_array = NNstaticmethods.replace(display_array, reshapedMatrix, pad + (j) * (example_height + pad) + 1, 
-						pad + (j) * (example_height + pad) + example_height,  pad + (i) * (example_width + pad) + 1,
-						pad + (i) * (example_width + pad) + example_width);
-			//	display_array.print();
+				// pad + (j - 1) * (exHeight + pad) + (1:exHeight), pad + (i - 1) * (exWidth + pad) + (1:exWidth))
+				dispArray = NNstaticmethods.replace(dispArray, reshapedMatrix, pad + (j) * (exHeight + pad) + 1, 
+						pad + (j) * (exHeight + pad) + exHeight,  pad + (i) * (exWidth + pad) + 1,
+						pad + (i) * (exWidth + pad) + exWidth);
+			//	dispArray.print();
 			//	while(!io.nextLine().equals(""));
 
-				curr_ex++;
+				currEx++;
 			}
-			if(curr_ex > m){
+			if(currEx > m){
 				break;
 			}
 		}
 
-		BufferedImage display = new BufferedImage(display_array.numCols, display_array.numRows, BufferedImage.TYPE_INT_RGB);
-		CommonOps.add(display_array, 1);
-		CommonOps.scale(127.5, display_array);
+		BufferedImage display = new BufferedImage(dispArray.numCols, dispArray.numRows, BufferedImage.TYPE_INT_RGB);
+		CommonOps.add(dispArray, 1);
+		CommonOps.scale(127.5, dispArray);
 
-		for(int x = 0; x < display_array.numCols; x++){
-			for(int y = 0; y < display_array.numRows; y++){
-				int value = (int)(display_array.get(y, x) + 0.5);
+		for(int x = 0; x < dispArray.numCols; x++){
+			for(int y = 0; y < dispArray.numRows; y++){
+				int value = (int)(dispArray.get(y, x) + 0.5);
 				display.setRGB(x, y, (new Color( value, value, value )).getRGB() );
 			}
 		}

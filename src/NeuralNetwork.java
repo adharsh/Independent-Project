@@ -1,3 +1,4 @@
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
@@ -11,6 +12,12 @@ import com.jmatio.types.MLDouble;
 public class NeuralNetwork {
 
 	public static void NeuralNetworkDemo( ) {
+		System.out.println("\tAn Artificial Intelligence Program Written By Adharsh Babu");
+		System.out.print("Handwritten Digit Classification and Recognition ");
+		System.out.println("Using Artificial Neural Networks");
+		System.out.println();
+		
+		
 		Scanner io = new Scanner(System.in);
 		//			Flow:
 		//			1. Read data from mat file into MLarray
@@ -37,7 +44,7 @@ public class NeuralNetwork {
 		int hiddenLayerSize = 25;
 		int kLabels = 10;
 
-		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/Data/data.mat" );
+		File dataMat = new File( "/Users/ababu/Dropbox/APrograms/JavaWorkspace/Independent-Project/Data/data.mat" );
 
 		MatFileReader matFileReader = null;
 		try {
@@ -71,25 +78,27 @@ public class NeuralNetwork {
 			DenseMatrix64F RowOfshowDataAsPics = NNstaticmethods.getRow(X, rowInd);
 			NNstaticmethods.setMatrixWithRow(showDataAsPics, RowOfshowDataAsPics, i);
 		}
-
-		new DataVisualization( showDataAsPics );
-
-
+		
+		String continueTestCase = "";
+		DataVisualization showDataAsPicsDV = new DataVisualization( showDataAsPics );
 		System.out.println("Program paused. Press enter to continue. \n");
-		while(!io.nextLine().equals(""));
-
+		continueTestCase = io.nextLine();
+		if(!continueTestCase.equals("")){ showDataAsPicsDV.destroy(); System.out.println(); }
+		
 		/**************** Initializing Neural Network Parameters ***************/					
 		System.out.println("Initializing Neural Network Paramters...");
 
 		DenseMatrix64F theta1 = NNstaticmethods.randInitializeWeights(inputLayerSize, hiddenLayerSize);
 		DenseMatrix64F theta2 = NNstaticmethods.randInitializeWeights(hiddenLayerSize, kLabels);
-
+		
+		continueTestCase = "";
+		DataVisualization initializingfilteredTheta1DV = new DataVisualization( NNstaticmethods.filter(theta1) );
+		System.out.println("Program paused. Press enter to continue. \n");
+		continueTestCase = io.nextLine();
+		if(!continueTestCase.equals("")){ initializingfilteredTheta1DV.destroy(); System.out.println(); }
 
 		//	DenseMatrix64F theta1 = NNstaticmethods.randInitializeWeights(inputLayerSize, hiddenLayerSize);
 		//	DenseMatrix64F theta2 = NNstaticmethods.randInitializeWeights(hiddenLayerSize, kLabels);
-
-		System.out.println("Program paused. Press enter to continue. \n");
-		while(!io.nextLine().equals(""));
 
 		/**************** Training Neural Network ***************/
 		System.out.println("Training Neural Network...");
@@ -98,7 +107,7 @@ public class NeuralNetwork {
 		double Jcost = 0.0;
 		double tempJcost = ((Double) (GradientDescent.nnCostFunction(theta1, theta2, kLabels, X, y, lambda))[0]).doubleValue();
 
-		outer:for(int i = 1; i <= 100; i++){
+		outer:for(int i = 1; i <= 150; i++){
 
 			Object[] data = GradientDescent.nnCostFunction(theta1, theta2, kLabels, X, y, lambda);
 
@@ -106,7 +115,7 @@ public class NeuralNetwork {
 			theta1 = (DenseMatrix64F) data[1];
 			theta2 = (DenseMatrix64F) data[2];
 
-			//			if( tempJcost < Jcost){	break outer; }
+	//					if( tempJcost < Jcost){	break outer; }
 			tempJcost = Jcost;
 
 			System.out.println("Iteration\t" + i + " | Cost: " + Jcost);
@@ -119,12 +128,13 @@ public class NeuralNetwork {
 
 		/**************** Visualizing Hidden Layer of Neural Network ***************/
 		System.out.println("Visualizing Hidden Layer of Neural Network...");
-		
-		//%%%%%% Display Data %%%%%%%%%
-		new DataVisualization(NNstaticmethods.filter(theta1));
 
+		//%%%%%% Display Data %%%%%%%%%
+		continueTestCase = "";
+		DataVisualization filteredTheta1DV = new DataVisualization( NNstaticmethods.filter(theta1) );
 		System.out.println("Program paused. Press enter to continue. \n");
-		while(!io.nextLine().equals(""));
+		continueTestCase = io.nextLine();
+		if(!continueTestCase.equals("")){ filteredTheta1DV.destroy(); System.out.println(); }
 
 		//%%%%%% Training Set Accuracy %%%%%%%%%
 		System.out.println("Training Set Accuracy: " + NeuralNetwork.trainingSetAccuracy(X, y, theta1, theta2)*100 + "%");
@@ -134,22 +144,43 @@ public class NeuralNetwork {
 
 		//%%%%%% Display Data %%%%%%%%%
 
-		System.out.println("Displaying Example Image...");
-
-		while(true){
+		System.out.print("Test Cases: ");
+		//	int testCases = io.nextInt();
+		System.out.println("Displaying Random Test Case Image...");
+		continueTestCase = "";
+		
+		while( continueTestCase.equals("") ){
 			int i = (int)(Math.random()*5000);
-			new DataVisualization(NNstaticmethods.getRow(X, i));
+			DataVisualization dataVis = new DataVisualization(NNstaticmethods.getRow(X, i));
 			int pred = NeuralNetwork.forwardPropagationNeuraNetwork(X, i, theta1, theta2);
-			System.out.println("Neural Network Predictions: " + pred );
+			System.out.println("Neural Network Prediction: " + pred );
 			System.out.println("Actual: " + actualValue(y, i));
 			System.out.println("Program paused. Press enter to continue. \n");
-			while(!io.nextLine().equals(""));
-
+			
+			continueTestCase = io.nextLine();
+			dataVis.destroy();
+			
 		}
-
+		
+		System.out.println();
+		
+		continueTestCase = "";
+		
+		while( continueTestCase.equals("") ){
+			
+			FreeHandPainter drawer = new FreeHandPainter(theta1, theta2);
+					
+			continueTestCase = io.nextLine();
+			FreeHandPainter.inputImageDV.destroy();
+			drawer.destroy();
+			
+		}
+		System.out.println();
+		System.out.println("Process Completed.");
+		System.exit(0);
 	}
-
-
+	
+	
 	public static double trainingSetAccuracy( DenseMatrix64F X, DenseMatrix64F y, DenseMatrix64F theta1, DenseMatrix64F theta2 ){
 
 		int nLabels = y.getNumElements();
@@ -173,16 +204,18 @@ public class NeuralNetwork {
 	public static int forwardPropagationNeuraNetwork( DenseMatrix64F X, int row, DenseMatrix64F theta1, DenseMatrix64F theta2 ){
 		return ((NNstaticmethods.maxIndex(BooleanOperatorsNN.feedForwardPropTwoLayers(NNstaticmethods.getRow(X, row), theta1, theta2))+1)%10);
 	}
+	
+	public static int forwardPropagationNeuraNetworkProcessingImages( DenseMatrix64F inputImage, DenseMatrix64F theta1, DenseMatrix64F theta2 ){
+		return ((NNstaticmethods.maxIndex(BooleanOperatorsNN.feedForwardPropTwoLayers(inputImage, theta1, theta2))+1)%10);
+	}
 
 
 	/*
 		while(io.nextLine().equals("")){
-
 			System.out.println("Displaying Example Image...");
 			//	(High - low + 1) * Math.random( ) + low
 			int rowNum = (int) ( (4999 - 0 + 1)*Math.random() + 0);
 			new DataVisualization( NNstaticmethods.getRow(X, rowNum));
-
 			int prediction = (int) ( (BooleanOperatorsNN.feedForwardPropTwoLayers(X, theta1, theta2)).get(0) + 0.5);
 			System.out.println("Neural Network Prediction: " + prediction);
 		}
