@@ -27,7 +27,8 @@ import org.ejml.ops.CommonOps;
 
 public class FreeHandPainter extends JFrame implements ActionListener {
 
-	public static DataVisualization inputImageDV;
+	public DataVisualization inputImageDV;
+	
 	int xCoordinate = Integer.MIN_VALUE;
 	int yCoordinate = Integer.MIN_VALUE;
 	private DenseMatrix64F theta1;
@@ -145,14 +146,14 @@ public class FreeHandPainter extends JFrame implements ActionListener {
 	
 	public void paint ( Graphics graphics ){
 		
-		graphics.setColor(new Color( 190, 190, 190));
-		graphics.fillOval( xCoordinate, yCoordinate, 25, 25);
+		graphics.setColor(new Color( 230, 230, 230));
+		graphics.fillOval( xCoordinate, yCoordinate, 20, 20);
 		
-		graphics.setColor(new Color( 250, 250, 250));
-		graphics.fillOval( xCoordinate + 6, yCoordinate + 6, 19, 19);
+		graphics.setColor(new Color( 240, 240, 240));
+		graphics.fillOval( xCoordinate + 4, yCoordinate + 4, 14, 14);
 		
 		graphics.setColor(Color.WHITE);
-		graphics.fillOval( xCoordinate + 5, yCoordinate + 5, 15, 15);
+		graphics.fillOval( xCoordinate + 2, yCoordinate + 2, 12, 12);
 		
 		
 	//	graphics.fillOval( xCoordinate, yCoordinate, 22, 22 ); 

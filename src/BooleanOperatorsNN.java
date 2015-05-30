@@ -55,7 +55,7 @@ public class BooleanOperatorsNN {
 
 	public static DenseMatrix64F ORneuralnetwork( DenseMatrix64F input ){
 
-		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/Data/ORweights.mat" );
+		File dataMat = new File( "/Users/ababu/Dropbox/Adharsh/APrograms/JavaWorkspace/Independent-Project/Data/ORweights.mat" );
 
 		MatFileReader matFileReader = null;
 		try {
@@ -75,7 +75,7 @@ public class BooleanOperatorsNN {
 
 	public static DenseMatrix64F ANDneuralnetwork( DenseMatrix64F input ){
 
-		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/Data/ANDweights.mat" );
+		File dataMat = new File( "/Users/ababu/Dropbox/Adharsh/APrograms/JavaWorkspace/Independent-Project/Data/ANDweights.mat" );
 
 		MatFileReader matFileReader = null;
 		try {
@@ -97,7 +97,7 @@ public class BooleanOperatorsNN {
 
 	public static DenseMatrix64F XNORneuralnetwork( DenseMatrix64F input ){
 
-		File dataMat = new File( "/Users/ababu/Documents/JavaWorkspace/Independent Project/Data/XNORweights.mat" );
+		File dataMat = new File( "/Users/ababu/Dropbox/Adharsh/APrograms/JavaWorkspace/Independent-Project/Data/XNORweights.mat" );
 
 		MatFileReader matFileReader = null;
 		try {
