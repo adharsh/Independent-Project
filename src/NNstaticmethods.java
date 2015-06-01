@@ -11,9 +11,25 @@ import com.jmatio.io.MatFileReader;
 import com.jmatio.types.MLDouble;
 
 public class NNstaticmethods {
-
-
-
+	
+	
+	
+	public static double[][] getDoubleData( DenseMatrix64F input ){
+		
+		double[][] answer = new double[input.numRows][input.numCols];
+		
+		for(int row = 0; row < input.numRows; row ++){
+			for(int col = 0; col < input.numCols; col++){
+				answer[row][col] = input.get(row, col);
+			}
+		}
+		
+		return answer;
+		
+	}
+	
+	
+	
 	public static DenseMatrix64F replace( DenseMatrix64F larger, DenseMatrix64F smaller, int startRow, int endRow, int startCol, int endCol ){
 
 		DenseMatrix64F answer = new DenseMatrix64F(larger);
@@ -326,14 +342,8 @@ public class NNstaticmethods {
 		System.out.println();
 		 */
 
-		DenseMatrix64F matrix = new DenseMatrix64F(20,20);
-		CommonOps.add(matrix, -1);
-		matrix.print();
-
-		DenseMatrix64F a = RandomMatrices.createRandom(1, 400, -1, 1, new Random());
-		a.print();
-
-		(NNstaticmethods.reshape(a, 20, 20)).print();
+		DenseMatrix64F a = RandomMatrices.createRandom(5000, 4000, -1, 1, new Random());
+		double[][] ans = NNstaticmethods.getDoubleData(a);
 		System.out.println((System.currentTimeMillis()-time)/1000.0);
 
 	}

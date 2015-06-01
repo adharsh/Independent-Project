@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -20,10 +22,10 @@ public class GradientDescent {
 		y = NNstaticmethods.categorizeClasses(y, labelSize);
 
 		DenseMatrix64F a1 = NNstaticmethods.addBias( X );
-
+		
 		DenseMatrix64F z2 = new DenseMatrix64F( a1.getNumRows(), thetaTranspose1.getNumCols());
 		CommonOps.mult( a1, thetaTranspose1, z2);
-
+		
 		DenseMatrix64F a2 = new DenseMatrix64F( z2.getNumRows(), z2.getNumCols());
 		a2 = NNstaticmethods.sigmoid(z2);
 		//valid
@@ -32,10 +34,8 @@ public class GradientDescent {
 		DenseMatrix64F z3 = new DenseMatrix64F( a2.getNumRows(), thetaTranspose2.getNumCols());
 		CommonOps.mult( a2, thetaTranspose2, z3);
 		
-		
 		DenseMatrix64F a3 = new DenseMatrix64F( z3.getNumRows(), z3.getNumCols() );
 		a3 = NNstaticmethods.sigmoid(z3);
-		
 		
 		DenseMatrix64F theta1Filtered = NNstaticmethods.filter( theta1 );
 		DenseMatrix64F theta2Filtered = NNstaticmethods.filter( theta2 );

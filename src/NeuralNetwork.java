@@ -1,12 +1,13 @@
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import org.ejml.data.DenseMatrix64F;
 
 import com.jmatio.io.MatFileReader;
+import com.jmatio.io.MatFileWriter;
 import com.jmatio.types.MLDouble;
 
 public class NeuralNetwork {
@@ -59,11 +60,8 @@ public class NeuralNetwork {
 		MLDouble XmlArray = (MLDouble) matFileReader.getMLArray("X");
 		MLDouble YmlArray = (MLDouble) matFileReader.getMLArray("y");
 
-		double[][] Xarray = XmlArray.getArray();
-		double[][] Yarray = YmlArray.getArray();
-
-		DenseMatrix64F X = new DenseMatrix64F(Xarray);
-		DenseMatrix64F y = new DenseMatrix64F(Yarray);
+		DenseMatrix64F X = new DenseMatrix64F(XmlArray.getArray());
+		DenseMatrix64F y = new DenseMatrix64F(YmlArray.getArray());
 
 		//	MatrixVisualization.show( Xdata, "Xdata" );
 
@@ -81,50 +79,77 @@ public class NeuralNetwork {
 
 		String continueTestCase = "";
 		DataVisualization showDataAsPicsDV = new DataVisualization( showDataAsPics );
-		System.out.println("Program paused. Press enter to continue. \n");
+		System.out.println("Program paused. Press enter to continue.");
 		continueTestCase = io.nextLine();
 		if(!continueTestCase.equals("")){ showDataAsPicsDV.destroy(); System.out.println(); }
 
 		/**************** Initializing Neural Network Parameters ***************/					
-		System.out.println("Initializing Neural Network Paramters...");
 
-		DenseMatrix64F theta1 = NNstaticmethods.randInitializeWeights(inputLayerSize, hiddenLayerSize);
-		DenseMatrix64F theta2 = NNstaticmethods.randInitializeWeights(hiddenLayerSize, kLabels);
+		System.out.print("Would you like to initialize parameters from given, preset values? (FileName/NO): ");
+		String response = io.next();
 
-		continueTestCase = "";
-		DataVisualization initializingfilteredTheta1DV = new DataVisualization( NNstaticmethods.filter(theta1) );
-		System.out.println("Program paused. Press enter to continue. \n");
-		continueTestCase = io.nextLine();
-		if(!continueTestCase.equals("")){ initializingfilteredTheta1DV.destroy(); System.out.println(); }
+		DenseMatrix64F theta1 = null;
+		DenseMatrix64F theta2 = null;
 
-		//	DenseMatrix64F theta1 = NNstaticmethods.randInitializeWeights(inputLayerSize, hiddenLayerSize);
-		//	DenseMatrix64F theta2 = NNstaticmethods.randInitializeWeights(hiddenLayerSize, kLabels);
 
-		/**************** Training Neural Network ***************/
-		System.out.println("Training Neural Network...");
+		if( !response.toUpperCase().equals("NO")){
 
-		double lambda = 30;
-		double Jcost = 0.0;
-		double tempJcost = ((Double) (GradientDescent.nnCostFunction(theta1, theta2, kLabels, X, y, lambda))[0]).doubleValue();
+			File parameters = new File( response );
 
-		outer:for(int i = 1; i <= 1000; i++){
+			MatFileReader weightReader = null;
+			try{
+				weightReader = new MatFileReader(parameters);
+			}catch(IOException e){
+				e.printStackTrace();
+			}
 
-			Object[] data = GradientDescent.nnCostFunction(theta1, theta2, kLabels, X, y, lambda);
+			MLDouble theta1ML = (MLDouble) weightReader.getMLArray("theta1");
+			MLDouble theta2ML = (MLDouble) weightReader.getMLArray("theta2");
 
-			Jcost = ((Double) data[0]).doubleValue();
-			theta1 = (DenseMatrix64F) data[1];
-			theta2 = (DenseMatrix64F) data[2];
+			theta1 = new DenseMatrix64F(theta1ML.getArray());
+			theta2 = new DenseMatrix64F(theta2ML.getArray());
 
-			if( tempJcost < Jcost){	break outer; }
-			tempJcost = Jcost;
 
-			System.out.println("Iteration\t" + i + " | Cost: " + Jcost);
+		}else{
+
+			System.out.println("\nInitializing Neural Network Paramters...");
+			theta1 = NNstaticmethods.randInitializeWeights(inputLayerSize, hiddenLayerSize);
+			theta2 = NNstaticmethods.randInitializeWeights(hiddenLayerSize, kLabels);
+
+			continueTestCase = "";
+			DataVisualization initializingfilteredTheta1DV = new DataVisualization( NNstaticmethods.filter(theta1) );
+	//		System.out.println("Program paused. Press enter to continue.");
+	//		continueTestCase = io.nextLine();
+	//		if(!continueTestCase.equals("")){ initializingfilteredTheta1DV.destroy(); System.out.println(); }
+
+			//	DenseMatrix64F theta1 = NNstaticmethods.randInitializeWeights(inputLayerSize, hiddenLayerSize);
+			//	DenseMatrix64F theta2 = NNstaticmethods.randInitializeWeights(hiddenLayerSize, kLabels);
+
+
+			/**************** Training Neural Network ***************/
+			System.out.println("\nTraining Neural Network...");
+
+			double lambda = 30;
+			double Jcost = 0.0;
+			double tempJcost = ((Double) (GradientDescent.nnCostFunction(theta1, theta2, kLabels, X, y, lambda))[0]).doubleValue();
+
+			outer:for(int i = 1; i <= 1000; i++){
+
+				Object[] data = GradientDescent.nnCostFunction(theta1, theta2, kLabels, X, y, lambda);
+
+				Jcost = ((Double) data[0]).doubleValue();
+				theta1 = (DenseMatrix64F) data[1];
+				theta2 = (DenseMatrix64F) data[2];
+
+				if( tempJcost < Jcost){	break outer; }
+				tempJcost = Jcost;
+
+				System.out.println("Iteration\t" + i + " | Cost: " + Jcost);
+
+			}
 
 		}
 		System.out.println();
-
-		System.out.println("Program paused. Press enter to continue. \n");
-		while(!io.nextLine().equals(""));
 
 		/**************** Visualizing Hidden Layer of Neural Network ***************/
 		System.out.println("Visualizing Hidden Layer of Neural Network...");
@@ -137,7 +162,7 @@ public class NeuralNetwork {
 		if(!continueTestCase.equals("")){ filteredTheta1DV.destroy(); System.out.println(); }
 
 		//%%%%%% Training Set Accuracy %%%%%%%%%
-		System.out.println("Training Set Accuracy: " + NeuralNetwork.trainingSetAccuracy(X, y, theta1, theta2)*100 + "%");
+		System.out.println("Training Set Accuracy: " + NeuralNetwork.trainingSetAccuracy(X, y, theta1, theta2 )*100 + "%");
 		System.out.println("Program paused. Press enter to continue. \n");
 		while(!io.nextLine().equals(""));
 
@@ -179,6 +204,23 @@ public class NeuralNetwork {
 
 		}
 
+		System.out.println();
+
+		System.out.print("Would you like to save Neural Network Parameters? (FileName/NO): ");
+		String save = io.next();
+
+		if(!save.toUpperCase().equals("NO")){
+			MLDouble mlTheta1 = new MLDouble( "theta1", NNstaticmethods.getDoubleData(theta1) );
+			MLDouble mlTheta2 = new MLDouble( "theta2", NNstaticmethods.getDoubleData(theta2) );
+			ArrayList list = new ArrayList();
+			list.add(mlTheta1);
+			list.add(mlTheta2);
+			try {
+				new MatFileWriter( save, list);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		System.out.println();
 		System.out.println("Process Completed.");
 		System.exit(0);
